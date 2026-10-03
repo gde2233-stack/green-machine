@@ -50,7 +50,7 @@ const P = id => D.players[id] || { name: id, member: 'sub' };
 const pname = id => P(id).name;
 const isTeam = id => ['current', 'former'].includes(P(id).member);
 const isCur = id => P(id).member === 'current';
-const nm = id => { const p = P(id); const n = esc(p.name) + (p.ret ? ' <span class="ret" title="Retired: team member, inactive since before 2024">(R)</span>' : ''); return isCur(id) ? `<b>${n}</b>` : n; };
+const nm = id => { const p = P(id); const n = esc(p.name) + (p.ret ? ' <span class="ret" title="Retired team member">(R)</span>' : ''); return isCur(id) ? `<b>${n}</b>` : n; };
 const plink = id => `<a href="#/player/${id}" class="pn${isCur(id) ? ' cur' : ''}">${nm(id)}</a>`;
 const posTag = id => P(id).pos ? `<span class="tag pos">${esc(P(id).pos)}</span>` : '';
 
@@ -340,8 +340,9 @@ function pgPlayers(el) {
   const grp = st => rows.filter(r => P(r.id).member === st).sort((a, b) => b.L.PA - a.L.PA);
   const yrs = id => { const p = P(id); return p.first ? (p.first === p.last ? `${p.first}` : `${p.first}–${p.last}`) : ''; };
   const card = r => `<a class="pl" href="#/player/${r.id}"><b class="${isCur(r.id) ? 'cur' : ''}">${esc(pname(r.id))}${P(r.id).ret ? ' <span class="ret">(R)</span>' : ''}${posTag(r.id)}</b><span>${r.L.G} G · ${f3(r.L.AVG)}/${f3(r.L.OBP)}/${f3(r.L.SLG)}<br>${yrs(r.id)}</span></a>`;
-  el.innerHTML = `<div class="page-h"><h1>Players</h1><div class="sub">Team membership is set by the manager. <b>Bold</b> = current team member. (R) = team member, inactive since before 2024. Everyone else is a sub.</div></div>
-  <h2>Team members <small>${grp('current').length + grp('former').length}</small></h2><div class="pl-list">${[...grp('current'), ...grp('former')].map(card).join('')}</div>
+  el.innerHTML = `<div class="page-h"><h1>Players</h1><div class="sub">Team membership is set by the manager. <b>Bold</b> = current team member. (R) = retired team member (inactive since before 2024, or retired by the manager). Everyone else is a sub.</div></div>
+  ${(() => { const tm = [...grp('current'), ...grp('former').filter(r => !P(r.id).ret)], rt = grp('former').filter(r => P(r.id).ret);
+    return `<h2>Team members <small>${tm.length}</small></h2><div class="pl-list">${tm.map(card).join('')}</div>` + (rt.length ? `<h2>Retired team members <small>${rt.length}</small></h2><div class="pl-list">${rt.map(card).join('')}</div>` : ''); })()}
   <h2>Subs <small>${grp('sub').length}</small></h2><div class="pl-list">${grp('sub').map(card).join('')}</div>`;
 }
 function pctPool(span) {
@@ -724,7 +725,7 @@ function pgGlossary(el) {
   const G = [['PA', DEF.PA + ' A pinch runner (tiebreak runner) is not a PA.'], ['AB', DEF.AB], ['AVG / OBP / SLG / OPS', 'Standard definitions. Reached on error and fielder\'s choice count as outs.'], ['wOBA', DEF.wOBA], ['wOBA+', DEF['wOBA+']], ['ISO', DEF.ISO], ['Out%', DEF['Out%']],
     ['RBI†', DEF.RBI], ['Qualified', DEF.Q + ' Percentile rankings use the same rule.'], ['Percentile rankings', 'A season is ranked against every qualified player-season; a year against player-years; an era against player-eras; a career against qualified careers.'],
     ['Where outs go', 'Built from scorebook notation: F = fly ball, L = line drive, P = pop-up, and 6-3 or 4U = a ground ball fielded by that position. Outfield numbering: 7 LF, 8 LCF, 9 RCF, 10 RF.'],
-    ['Team member', 'Set by the manager. Bold names are current team members. (R) = a team member who hasn\'t played since before 2024.'], ['Sub', 'Everyone else. Anyone with fewer than 10 games who hasn\'t played in the last 2 years is a sub.'],
+    ['Team member', 'Set by the manager. Bold names are current team members. (R) = a retired team member: inactive since before 2024, or retired by the manager.'], ['Sub', 'Everyone else. Anyone with fewer than 10 games who hasn\'t played in the last 2 years is a sub.'],
     ['Eras', D.config.eras.map(e => `${e.name}: ${e.label}`).join('. ') + '. The Stats page starts with players from every era; tap an era to hide or show its players.'],
     ['Season awards', 'MVP = best wOBA among qualified hitters. Batting Crown = best qualified AVG. Slugger, RBI Crown and Run Crown = most HR (min. 2), RBI and runs. Playoff MVP = best postseason wOBA (min. 5 PA, 2+ playoff box scores). Seasons with at least 4 box scores.'],
     ['Cycle', 'A single, double, triple and home run by one player in one game.'], ['Streaks', 'Multi-hit streak = consecutive games played with 2+ hits. HR streak = consecutive games played with a home run. Only games whose season is known count.'],
@@ -766,15 +767,15 @@ function decorate(root) {
   set('.tag.po', () => 'Playoff game');
   set('.tag.lc', e => /final/i.test(e.textContent) ? 'Championship game' : 'Won the season-ending league tournament');
   set('.tag.rc', () => 'Finished first (or tied) in the regular-season standings');
-  set('.tag.reg', () => 'Current team member'); set('.tag.fr', e => /retired/i.test(e.textContent) ? 'Team member, inactive since before 2024' : 'Team member'); set('.tag.sub', () => 'Substitute player');
-  set('.ret', () => 'Retired: team member, inactive since before 2024');
+  set('.tag.reg', () => 'Current team member'); set('.tag.fr', e => /retired/i.test(e.textContent) ? 'Retired team member' : 'Team member'); set('.tag.sub', () => 'Substitute player');
+  set('.ret', () => 'Retired team member');
   set('.wl.W', () => 'Win'); set('.wl.L', () => 'Loss'); set('.wl.T', () => 'Tie');
   set('.wl.U', () => "Result unknown: the opponent's score was not recorded");
   set('.cyc', () => 'Hit for the cycle: a single, double, triple and home run in one game');
   set('.trophy', () => 'Championship');
   set('.chip.r', () => 'Scored a run (gold outline)');
 }
-const LEGEND = [['<b>Bold name</b>', 'Current team member'], ['(R)', 'Retired: team member, inactive since before 2024'],
+const LEGEND = [['<b>Bold name</b>', 'Current team member'], ['(R)', 'Retired team member'],
   ['<span class="tag pos">UT</span>', 'Usual position (P, C, 1B, 2B, 3B, SS, LF, LCF, RCF, RF; UT = utility)'], ['<span class="tag est">est.</span>', 'Season estimated from the lineup (not written in the scorebook)'],
   ['Mar 3, 2025*', 'Date estimated from scorebook order'], ['<span class="wl W">W</span> <span class="wl L">L</span> <span class="wl T">T</span> <span class="wl U">?</span>', "Win, loss, tie; ? = opponent's score not recorded (result unknown)"],
   ['<span class="tag po">PO</span>', 'Playoff game'], ['<span class="tag lc">Final</span>', 'Championship game'], ['<span class="tag lc">League champs</span>', 'Won the league tournament'],
