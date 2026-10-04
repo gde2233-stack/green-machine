@@ -326,3 +326,16 @@ a.opp{font-weight:400}
 .up-more[open] summary{border-bottom:1px solid var(--line)}
 .up-time{display:block;font-weight:600;font-size:13px;color:var(--ink);margin-top:2px}
 .up-opp small span{white-space:nowrap}
+
+.pl-search{display:flex;align-items:center;gap:10px;margin:6px 0 4px}
+.pl-search input{flex:1;max-width:420px;font:inherit;font-size:16px;padding:10px 14px;border:1px solid var(--ctl-bd);border-radius:10px;background:var(--card);color:var(--ink)}
+.pl-search input:focus{outline:2px solid var(--em);outline-offset:1px}
+.pl[hidden],.pl-sec[hidden]{display:none}
+/* v32: stress-test fixes */
+.legend .lg{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.bracket{max-width:100%;min-width:0}
+h1,.page-h{overflow-wrap:anywhere}
+.st th button{display:inline-flex;align-items:center;min-height:24px;padding:2px 0}
+.legend summary{padding:4px 0}
+.up-more summary{min-height:24px;display:flex;align-items:center}
+.lead > span > a,.lead > a,.cardh a,.foot a,.pl-list a{display:inline-block;min-height:24px;line-height:24px}
