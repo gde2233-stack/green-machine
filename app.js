@@ -234,6 +234,7 @@ function recap(g) {
   cyc.filter(p => p !== t?.b.p).forEach(p => s += ` ${pname(p)} hit for the cycle.`);
   const inn = g.ls.gm.map((v, i) => [v, i + 1]).filter(x => x[0] != null).sort((a, b) => b[0] - a[0])[0];
   if (inn && inn[0] >= 6) s += ` The big inning: ${inn[0]} runs in the ${ord(inn[1])}.`;
+  if (g.hl) s += ' ' + g.hl;
   return s;
 }
 const ord = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 > 10 && n % 100 < 14) ? 0 : n % 10] || 'th');
