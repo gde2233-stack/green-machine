@@ -1,5 +1,5 @@
 // network-first for data and pages, cache fallback for offline
-const C='gm-v12';
+const C='gm-v13';
 self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch',e=>{

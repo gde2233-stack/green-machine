@@ -237,6 +237,7 @@ function recap(g) {
   if (g.hl) s += ' ' + g.hl;
   return s;
 }
+const storyLink = g => g.story && /^gazette\/[\w-]+\.html$/.test(g.story.href) ? ` <a class="recap-link" href="${g.story.href}" aria-label="Read the full recap: ${esc(g.story.title)} (${esc(g.story.pub || 'Green Machine Gazette')})">RECAP ›</a>` : '';
 const ord = n => n + (['th', 'st', 'nd', 'rd'][(n % 100 > 10 && n % 100 < 14) ? 0 : n % 10] || 'th');
 
 /* ================= PAGES ================= */
@@ -257,12 +258,12 @@ function pgHome(el) {
     <div class="rec"><div><b>${curS.w}-${curS.l}${curS.t ? '-' + curS.t : ''}</b><span>${sLabel(curS.season)}</span></div><div><b>${at.w + at.po_w}-${at.l + at.po_l}${at.t ? '-' + at.t : ''}</b><span>All-time</span></div><div><b class="g">${D.history.league_championships.length}</b><span>League titles</span></div><div><b>${D.history.regular_season_championships.length}</b><span>Reg. season titles</span></div></div>
   </div>
   <h2>Latest game <small>${fdate(last.date, last.est)} · ${sLink(last.season)}</small></h2>
-  <a class="card gcard" href="#/game/${last.key}">
+  <div class="card gcard gwrap"><a class="gmain" href="#/game/${last.key}">
     <div class="kick">${last.champ ? TROPHY + ' Championship game' : 'Final' + (last.po ? ' · Playoffs' : '')}${cyc.length ? ' · <span class="cyc">Cycle</span>' : ''}</div>
     <div class="score"><span class="tm">Green Machine</span><span class="rn ${res(last) === 'L' ? 'lo' : ''}">${last.gm}</span></div>
     <div class="score"><span class="tm" style="color:var(--ink2)">${last.opp === UNKNOWN_OPP ? 'Opponent' : esc(last.opp)}</span><span class="rn ${res(last) === 'W' ? 'lo' : ''}">${last.op ?? '?'}</span></div>
-    <p class="recap">${esc(recap(last))}</p>
-  </a>
+    <p class="recap">${esc(recap(last))}</p></a>${storyLink(last)}
+  </div>
   ${upcomingHTML()}
   ${onThisDate()}
   ${(() => { const f = milestoneFeed().slice(-6).reverse(); return f.length ? `<h2>Latest milestones</h2><div class="card">${f.map(feedRow).join('')}</div>` : ''; })()}
@@ -475,7 +476,7 @@ function pgGame(el, key) {
   el.innerHTML = `${g.champ ? `<div class="champ-banner">${TROPHY}<div><b>${esc(g.title || 'Championship game')}</b><span>${r === 'W' ? `${sLabel(g.season)} league champions` : r === 'L' ? 'Lost the final' : sLabel(g.season) + ' final'}</span></div></div>` : ''}
   <div class="page-h"><div class="kick">${g.date ? fdate(g.date, g.est) : 'Date unknown'} · ${g.season ? sLink(g.season) + (g.sest ? ' (est.)' : '') : 'Season unknown'}${g.po && !g.champ ? ' · Playoffs' : ''}</div>
     <h1>${g.op == null ? `Green Machine ${g.gm} · <span class="sub">opponent score not recorded</span>` : `${wl(g)} Green Machine ${g.gm}, ${g.opp === UNKNOWN_OPP ? 'Opponent' : esc(g.opp)} ${g.op}`}</h1><div class="sub">${esc(g.end)}${g.home == null ? '' : g.home ? ' · Home' : ' · Away'} · ${g.opp === UNKNOWN_OPP ? '<span class="sub">Opponent not recorded</span>' : `<a href="#/opp/${encodeURIComponent(g.opp)}">All games ${vsTxt(g.opp)}</a>`}</div></div>
-  <p class="recap card">${esc(recap(g))}${cyc.length ? ` <span class="cyc">Cycle: ${cyc.map(p => esc(pname(p))).join(', ')}</span>` : ''}</p>
+  <p class="recap card">${esc(recap(g))}${cyc.length ? ` <span class="cyc">Cycle: ${cyc.map(p => esc(pname(p))).join(', ')}</span>` : ''}${storyLink(g)}</p>
   <div class="ctl">${prev ? `<a class="btn ghost" href="#/game/${prev.key}">‹ Prev</a>` : ''}${next ? `<a class="btn ghost" href="#/game/${next.key}">Next ›</a>` : ''}<button class="btn" onclick="shareCard('${g.key}')">Share card</button></div>
   <div class="tw"><table class="st ls"><thead><tr><th class="l">Team</th>${Array.from({ length: n }, (_, k) => `<th>${k + 1}</th>`).join('')}<th>R</th></tr></thead><tbody>
   ${rowsLS.map(([t, a, rr]) => `<tr><td class="l"><b>${t}</b></td>${Array.from({ length: n }, (_, k) => `<td>${cell(a[k], k)}</td>`).join('')}<td><b>${rr}</b></td></tr>`).join('')}</tbody></table></div>

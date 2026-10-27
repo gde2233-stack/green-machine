@@ -339,3 +339,7 @@ h1,.page-h{overflow-wrap:anywhere}
 .legend summary{padding:4px 0}
 .up-more summary{min-height:24px;display:flex;align-items:center}
 .lead > span > a,.lead > a,.cardh a,.foot a,.pl-list a{display:inline-block;min-height:24px;line-height:24px}
+
+.gwrap{padding:0}.gwrap .gmain{display:block;color:inherit;padding:12px 14px}.gwrap .gmain:hover{text-decoration:none}.gwrap:hover{border-color:var(--em)}.gwrap > .recap-link{margin:0 14px 12px}
+.recap-link{display:inline-block;font:700 12px/1 Inter,system-ui,sans-serif;letter-spacing:.08em;color:#fff;background:var(--forest);border-radius:4px;padding:7px 10px;text-decoration:none;vertical-align:middle;min-height:24px}
+.recap-link:hover,.recap-link:focus-visible{background:var(--em-d);text-decoration:none}
